@@ -8,7 +8,11 @@ class Kasa:
     @classmethod
     async def create(cls):
         self = cls()
-        await self._discover()
+        for i in range(5):
+            await self._discover()
+            if self._devices:
+                break
+            print(f"Discovery Failed: {i}/5")
         return self
 
     async def _discover(self):
