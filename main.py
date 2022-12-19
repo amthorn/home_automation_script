@@ -28,6 +28,7 @@ async def main_event_loop():
             for category, targets in rules.items():
                 for name, operations in targets.items():
                     # get the device
+                    print(devices[category]._devices)
                     device = devices[category]._devices.get(name)
                     for operation in operations:
                         await operation(device)()
