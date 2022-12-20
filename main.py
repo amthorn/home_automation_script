@@ -1,7 +1,9 @@
 import asyncio
+import os
 import time
 from devices.fans import Fans
 from devices.lights import Lights
+from devices.iphone import Iphone
 from operations.timeout import Timeout
 from operations.pulse import Pulse
 
@@ -17,12 +19,20 @@ rules = {
 }
 
 async def main_event_loop():
+    prelogged_devices = {
+        'iphone': Iphone(credentials={
+            "apple_id": os.environ['HA_ICLOUD_EMAIL'],
+            "password": os.environ['HA_ICLOUD_PASSWORD'],
+        })
+    }
     while True:
         print("Discovering...")
         devices = {
             'lights': await Lights.create(),
-            'fans': await Fans.create()
+            'fans': await Fans.create(),
+            **prelogged_devices,
         }
+        devices['iphone'].isHome()
         print("Applying rules...")
         try:
             for category, targets in rules.items():
