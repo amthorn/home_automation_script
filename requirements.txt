@@ -1,2 +1,0 @@
-python-kasa==0.5.0
-pyicloud==1.0.0
