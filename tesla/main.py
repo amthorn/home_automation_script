@@ -4,8 +4,10 @@ import os
 import socketserver
 from teslajsonpy import Controller
 from http import HTTPStatus
+from urllib import parse
 
 async def preheat_async(client, temperature, vin):
+    print("Preheating...")
     await client.connect()
     await client.generate_car_objects(wake_if_asleep=True)
     await client.cars[vin].set_temperature(temperature)
@@ -21,22 +23,27 @@ async def preheat_async(client, temperature, vin):
     # 6 (third row left)
     # 7 (third row right)
     await client.cars[vin].remote_seat_heater_request(seat_id=0, level=2)
+    print("Done preheating!")
 
 
-def preheat():
+def preheat(temp):
+    print("Connecting to tesla API")
     client = Controller(
         email='avatheavian@gmail.com',
         access_token=os.environ['TESLA_ACCESS_TOKEN'],
         refresh_token=os.environ['TESLA_REFRESH_TOKEN']
     )
-    asyncio.run(preheat_async(client, float(os.environ['TESLA_TARGET_TEMP_C']), os.environ['TESLA_VIN']))
+    asyncio.run(preheat_async(client, temp, os.environ['TESLA_VIN']))
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
+        print("Got new GET request: {self.path}")
         self.send_response(HTTPStatus.OK)
         self.end_headers()
-        preheat()
+        args = parse.parse_qs(parse.urlparse(self.path).query)
+        temp = float(args['temperature'][0])
+        preheat(temp)
 
 
 httpd = socketserver.TCPServer(('', 8000), Handler)
