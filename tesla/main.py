@@ -10,7 +10,7 @@ async def preheat_async(client, temperature, vin):
     print("Preheating...")
     await client.connect()
     await client.generate_car_objects(wake_if_asleep=True)
-    await client.wake_up()
+    await client.cars[vin].wake_up()
     await client.cars[vin].set_temperature(temperature)
     await client.cars[vin].set_hvac_mode(value='on')
     await client.cars[vin].set_heated_steering_wheel(value='on')
@@ -31,7 +31,7 @@ def preheat(temp):
     print("Connecting to tesla API")
     client = Controller(
         email='avatheavian@gmail.com',
-        access_token=os.environ['TESLA_ACCESS_TOKEN'],
+        # access_token=os.environ['TESLA_ACCESS_TOKEN'],
         refresh_token=os.environ['TESLA_REFRESH_TOKEN']
     )
     asyncio.run(preheat_async(client, temp, os.environ['TESLA_VIN']))
