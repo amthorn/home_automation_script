@@ -10,6 +10,7 @@ async def preheat_async(client, temperature, vin):
     print("Preheating...")
     await client.connect()
     await client.generate_car_objects(wake_if_asleep=True)
+    await client.wake_up()
     await client.cars[vin].set_temperature(temperature)
     await client.cars[vin].set_hvac_mode(value='on')
     await client.cars[vin].set_heated_steering_wheel(value='on')
